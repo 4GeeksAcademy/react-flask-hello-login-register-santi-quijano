@@ -16,6 +16,7 @@ from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended import JWTManager
 
+from flask_bcrypt import Bcrypt
 # from models import Person
 
 ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
@@ -23,6 +24,7 @@ static_file_dir = os.path.join(os.path.dirname(
     os.path.realpath(__file__)), '../public/')
 
 app = Flask(__name__)
+bcrypt = Bcrypt(app)
 app.url_map.strict_slashes = False
 
 app.config["JWT_SECRET_KEY"] = "super-secret"  # Change this!
@@ -76,6 +78,25 @@ def serve_any_other_file(path):
     response.cache_control.max_age = 0  # avoid cache memory
     return response
 
+@app.route('/signup', methods=['POST'])
+def signup():
+    body = request.get_json(silent=True)
+    if body is None: 
+        return jsonify({'msg': 'You must send data in your body'}), 400
+    if 'email' not in body:
+        return jsonify({'msg': 'Email field is obligatory'}), 400
+    if 'password' not in body:
+        return jsonify({'msg': 'Password field is obligatory'}), 400
+    user = User()
+    user.email = body['email']
+    pw_hash = bcrypt.generate_password_hash(body['password']).decode('utf-8')
+    user.password = pw_hash
+    user.is_active = True
+    db.session.add(user)
+    db.session.commit()
+    return jsonify({'msg': 'User was successfully created'}), 200
+
+
 @app.route('/login', methods=['POST'])
 def login():
     body = request.get_json(silent=True)
@@ -88,18 +109,20 @@ def login():
     user = User.query.filter_by(email= body['email']).first()
     if user is None: 
         return jsonify({'msg': 'Bad Email or Password'}), 400
-    if user.password != body['password']: 
+    check_password = bcrypt.check_password_hash(user.password, body['password'])
+    if check_password == False:
         return jsonify({'msg': 'Bad Email or Password'}), 400
     access_token = create_access_token(identity=user.email)
     return jsonify({'msg': 'Ok', 'token': access_token})
 
+@app.route('/protected', methods=['GET'])
+@jwt_required()
+def protected():
+    current_user = get_jwt_identity()
+    return jsonify({'msg': 'Ok', 'user': current_user}), 200
 
 
-
-
-
-
-
+    
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
