@@ -87,6 +87,10 @@ def signup():
         return jsonify({'msg': 'Email field is obligatory'}), 400
     if 'password' not in body:
         return jsonify({'msg': 'Password field is obligatory'}), 400
+    user_exists = User.query.filter_by(email='email').first() is not None
+    if user_exists:
+        return jsonify({'msg': 'User already exists'}), 409
+    
     user = User()
     user.email = body['email']
     pw_hash = bcrypt.generate_password_hash(body['password']).decode('utf-8')
@@ -114,6 +118,7 @@ def login():
         return jsonify({'msg': 'Bad Email or Password'}), 400
     access_token = create_access_token(identity=user.email)
     return jsonify({'msg': 'Ok', 'token': access_token})
+
 
 @app.route('/protected', methods=['GET'])
 @jwt_required()
