@@ -23,7 +23,7 @@ const Layout = () => {
                 <ScrollToTop>
                     <Routes>
                         <Route element={<LoginPage />} path="/" />
-                        <Route element={<SignUpPage />} path="/sign-up-page" />
+                        <Route element={<SignUpPage />} path="/sign-up" />
                         <Route element={<PrivatePage />} path="/private/:theid" />
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
