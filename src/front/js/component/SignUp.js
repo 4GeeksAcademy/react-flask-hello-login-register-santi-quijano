@@ -15,6 +15,7 @@ const SignUp = () => {
                         </div>
                     </div>
                     <div className="action">
+                        <button className='return-login'>Return Login</button>
                         <button type="submit">Sign Up</button>
                     </div>
                 </form>
