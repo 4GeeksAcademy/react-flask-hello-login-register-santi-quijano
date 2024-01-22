@@ -5,13 +5,11 @@ const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const handleLogin = () => {
 
-    }
     return (
         <div className='login container'>
             <div className="login-form">
-                <form onSubmit={handleLogin}>
+                <form>
                     <h1>Login</h1>
                     <div className="content">
                         <div className="input-field">

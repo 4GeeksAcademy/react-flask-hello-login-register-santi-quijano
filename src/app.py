@@ -81,12 +81,14 @@ def serve_any_other_file(path):
 @app.route('/signup', methods=['POST'])
 def signup():
     body = request.get_json(silent=True)
+
     if body is None: 
         return jsonify({'msg': 'You must send data in your body'}), 400
     if 'email' not in body:
         return jsonify({'msg': 'Email field is obligatory'}), 400
     if 'password' not in body:
         return jsonify({'msg': 'Password field is obligatory'}), 400
+    
     user_exists = User.query.filter_by(email='email').first() is not None
     if user_exists:
         return jsonify({'msg': 'User already exists'}), 409
