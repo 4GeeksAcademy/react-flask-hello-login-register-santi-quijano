@@ -27,7 +27,7 @@ app = Flask(__name__)
 bcrypt = Bcrypt(app)
 app.url_map.strict_slashes = False
 
-app.config["JWT_SECRET_KEY"] = "super-secret"  # Change this!
+app.config["JWT_SECRET_KEY"] = os.environ.get('JWT_SECRET')  # Change this!
 jwt = JWTManager(app)
 
 # database condiguration
