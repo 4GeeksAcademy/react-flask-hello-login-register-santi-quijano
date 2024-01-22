@@ -20,7 +20,7 @@ const Login = () => {
                         </div>
                     </div>
                     <div className="action">
-                        <Link to="/sign-up"><button>Sign Up</button></Link>
+                        <Link to="/"><button>Sign Up</button></Link>
                         <button type='submit'>Sign in</button>
                     </div>
                 </form>
