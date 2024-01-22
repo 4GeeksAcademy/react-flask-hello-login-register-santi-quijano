@@ -112,7 +112,9 @@ def login():
         return jsonify({'msg': 'Email field is obligatory'}), 400
     if 'password' not in body:
         return jsonify({'msg': 'Password field is obligatory'}), 400
+    
     user = User.query.filter_by(email= body['email']).first()
+    
     if user is None: 
         return jsonify({'msg': 'Bad Email or Password'}), 400
     check_password = bcrypt.check_password_hash(user.password, body['password'])

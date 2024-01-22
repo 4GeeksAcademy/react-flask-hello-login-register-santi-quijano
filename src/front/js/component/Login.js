@@ -5,11 +5,28 @@ const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        const response = await fetch('https://supreme-trout-jv455xrpp4xfwvj-3001.app.github.dev/login', {
+            method: "POST",
+            headers: {
+                'Content-Type': 'applications/json',
+            },
+            body: JSON.stringify({ email, password }),
+        });
+        if (response.ok) {
+            const data = await response.json();
+            sessionStorage.setItem('token', data.token);
+            console.log("User has logged successfully!")
+        } else {
+            console.error("There has been an error!")
+        }
+    }
 
     return (
         <div className='login container'>
             <div className="login-form">
-                <form>
+                <form onSubmit={handleLogin}>
                     <h1>Login</h1>
                     <div className="content">
                         <div className="input-field">

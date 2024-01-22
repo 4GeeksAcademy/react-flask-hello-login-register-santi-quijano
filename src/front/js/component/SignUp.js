@@ -1,11 +1,33 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 
 const SignUp = () => {
+
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const navigate = useNavigate();
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const response = await fetch('https://supreme-trout-jv455xrpp4xfwvj-3001.app.github.dev/login', {
+            method: "POST",
+            headers: {
+                'Content-Type': 'applications/json',
+            },
+            body: JSON.stringify({ email, password }),
+        });
+        if (response.ok) {
+            console.log('User signed up successfully');
+        } else {
+            console.error('Error signing up');
+        }
+        navigate("/")
+    };
+
     return (
         <div className="sign-up-container">
             <div className="sign-up-form">
-                <form>
+                <form onSubmit={handleSubmit}>
                     <h1>Sign Up</h1>
                     <div className="content-signup">
                         <div className="input-field">
