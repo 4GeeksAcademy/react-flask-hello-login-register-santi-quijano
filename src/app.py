@@ -116,7 +116,7 @@ def login():
     check_password = bcrypt.check_password_hash(user.password, body['password'])
     if check_password == False:
         return jsonify({'msg': 'Bad Email or Password'}), 400
-    access_token = create_access_token(identity=user.email)
+    access_token = create_access_token(identity=user.id)
     return jsonify({'msg': 'Ok', 'token': access_token})
 
 
