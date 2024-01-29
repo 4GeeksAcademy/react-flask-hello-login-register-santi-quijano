@@ -1,10 +1,10 @@
 import React from 'react'
 import SignUp from '../component/SignUp'
 
-const SignUpPage = () => {
+const SignUpPage = ({ actions }) => {
     return (
         <div>
-            <SignUp />
+            <SignUp actions={actions} />
         </div>
     )
 }

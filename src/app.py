@@ -78,21 +78,29 @@ def serve_any_other_file(path):
     response.cache_control.max_age = 0  # avoid cache memory
     return response
 
+
 @app.route('/signup', methods=['POST'])
 def signup():
     body = request.get_json(silent=True)
 
     if body is None: 
         return jsonify({'msg': 'You must send data in your body'}), 400
-    if 'email' not in body:
-        return jsonify({'msg': 'Email field is obligatory'}), 400
-    if 'password' not in body:
-        return jsonify({'msg': 'Password field is obligatory'}), 400
     
+    if 'email' not in body or 'password' not in body:
+        return jsonify({'msg': 'Email and password fields are obligatory'}), 400
+
+    if len(body['password']) < 8:
+        return jsonify({'msg': 'Password must be at least 8 characters long '}), 400
+
+    if not any(char.isdigit() for char in body['password']):
+        return jsonify({'msg': 'Password must contain at least 1 digit'}), 400
+
     user_exists = User.query.filter_by(email='email').first() is not None
+    
     if user_exists:
         return jsonify({'msg': 'User already exists'}), 409
     
+    #Saves user
     user = User()
     user.email = body['email']
     pw_hash = bcrypt.generate_password_hash(body['password']).decode('utf-8')
@@ -100,28 +108,34 @@ def signup():
     user.is_active = True
     db.session.add(user)
     db.session.commit()
+
     return jsonify({'msg': 'User was successfully created'}), 200
 
-
+#Also known as POST /token
 @app.route('/login', methods=['POST'])
 def login():
     body = request.get_json(silent=True)
+
     if body is None: 
         return jsonify({'msg': 'You must send data in your body'}), 400
-    if 'email' not in body:
-        return jsonify({'msg': 'Email field is obligatory'}), 400
-    if 'password' not in body:
-        return jsonify({'msg': 'Password field is obligatory'}), 400
     
+    if 'email' not in body or 'password' not in body: 
+        return jsonify({'msg': 'Email or Password field is obligatory'}), 400
+    
+    if '@' not in body['email']:
+        return jsonify({'msg': 'Invalid email format'}), 400
+
     user = User.query.filter_by(email= body['email']).first()
     
     if user is None: 
-        return jsonify({'msg': 'Bad Email or Password'}), 400
+        return jsonify({'msg': 'Unauthorized Access'}), 401
+    
     check_password = bcrypt.check_password_hash(user.password, body['password'])
+
     if check_password == False:
-        return jsonify({'msg': 'Bad Email or Password'}), 400
+        return jsonify({'msg': 'Invalid Email or Password'}), 400
     access_token = create_access_token(identity=user.id)
-    return jsonify({'msg': 'Ok', 'token': access_token})
+    return jsonify({'msg': 'Login successful!', 'token': access_token}), 200
 
 
 @app.route('/protected', methods=['GET'])
